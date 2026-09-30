@@ -1,2 +1,3 @@
-# docassemble-RIHealthCarePowerOfAttorneyMinor
-A docassemble project for RIHealthCarePowerOfAttorneyMinor.
+# docassemble.RIHealthCarePowerOfAttorneyMinor
+
+A docassemble extension.

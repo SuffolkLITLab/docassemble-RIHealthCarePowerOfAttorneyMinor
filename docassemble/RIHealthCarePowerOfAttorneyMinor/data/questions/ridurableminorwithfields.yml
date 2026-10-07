@@ -5,9 +5,9 @@ include:
 ---
 metadata:
   title: >-
-    RIDurableMinor-with-fields
+    Rhode Island: Durable Power of Attorney for Minor
   short title: >-
-    RIDurableMinor-with-field
+    RI Power of Attorney (Minor)
   description: |-
     This form allows parents to appoint a caregiver to make healthcare decisions for their child in case they are unable to do so. It ensures that medical treatment can be provided promptly when needed.
   can_I_use_this_form: |
@@ -113,6 +113,9 @@ code: |
   # Below sets the user_role and user_ask_role by asking a question.
   # You can set user_ask_role directly instead to either 'plaintiff' or 'defendant'
   #user_ask_role
+  is_parent
+  if is_parent == False:
+    required_info
   nav.set_section("about_you")
   users.gather()
   set_parts(subtitle=str(users))
@@ -173,6 +176,10 @@ fields:
     datatype: date
   - "First parent full name": users1_name_1
   - label: Date of second parent signature
+    #Need to change this variable, but it works...
+    show if:
+      code: |
+        is_parent == False
     field: users2_signature_date
     datatype: date
     required: False
@@ -272,10 +279,10 @@ sets:
   - children[i].name.middle
   - children[i].name.suffix
 question: |
-  % if hasattr(children, 'ask_number') and children.ask_number and children.target_number == 1:
-  Name of child
+  % if hasattr(children, 'ask_number') and children.ask_number and children.target_number == 1 and is_parent:
+  Name of your child
   % else:
-  Name of the ${ ordinal(i) } child
+  Name of the parent's child
   % endif
 fields:
   - code: |
@@ -313,6 +320,30 @@ fields:
       notary[i].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE)
   - County: notary[i].address.county
 ---
+id: preliminary question
+question: "Are you the parent of the minor for whom this form is for?"
+fields:
+  - Parent?: is_parent
+    datatype: yesnoradio
+---
+id: nonparent info
+question: "If you are not the parent, do you have all the necessary information to fill out the form?"
+subquestion: |2-
+  Required Information:
+  
+  Parent information required:
+  First and Last name
+  Address
+  
+  Child information required:
+  First and Last name
+  Birthday
+  Caregiver's full name and address
+  
+fields:
+  - Information?: required_info
+    datatype: yesnoradio
+---
 id: users names
 sets:
   - users[i].name.first
@@ -320,13 +351,12 @@ sets:
   - users[i].name.middle
   - users[i].name.suffix
 question: |
-  % if i == 0 and al_person_answering == "user":
+  % if i == 0 and al_person_answering == "user" and is_parent:
   What is your name?
   % elif al_form_type in ['starts_case', 'existing_case', 'appeal']:
   Who is the ${ ordinal(i) } person on your side of the case?
   % else:
-  What is the name of the ${ ordinal(i) } person who is adding their
-  name to this form with you?
+  What is the name of the Parent(s) who you are filling this form for?
   % endif
 fields:
   - code: |

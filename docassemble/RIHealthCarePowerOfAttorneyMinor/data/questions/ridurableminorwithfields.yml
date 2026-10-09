@@ -120,9 +120,8 @@ code: |
   users.gather()
   set_parts(subtitle=str(users))
   users[0].address.address
-  users1_signature_date
+  #users1_signature_date
   set_progress(25)
-  #page_1_marker_4
   nav.set_section("people")
   children.gather()
   children[0].birthdate
@@ -135,7 +134,10 @@ code: |
   notary.gather()
   notary[0].address.address
   notary1_signature_date_day
-  signature_date
+  known_sign_date
+  if known_sign_date:
+    users1_signature_date
+    signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
       persistent=True,
@@ -165,6 +167,13 @@ subquestion: |
   - Provide a copy to the designated caregiver and keep one for your records.
 
   You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
+---
+id: known signature date
+question: "Signature Date"
+subquestion: "Do you know when you plan on signing this form in front of a notary?"
+fields:
+  - " ": known_sign_date
+    datatype: yesnoradio
 ---
 id: Parent Signatures
 question: |
@@ -332,12 +341,17 @@ subquestion: |2-
   Required Information:
   
   Parent information required:
+  
   First and Last name
+  
   Address
   
   Child information required:
+  
   First and Last name
+  
   Birthday
+  
   Caregiver's full name and address
   
 fields:
@@ -355,6 +369,8 @@ question: |
   What is your name?
   % elif al_form_type in ['starts_case', 'existing_case', 'appeal']:
   Who is the ${ ordinal(i) } person on your side of the case?
+  % elif i == 1 and al_person_answering == "user" and is_parent:
+  What is the name of the second parent or guardian?
   % else:
   What is the name of the Parent(s) who you are filling this form for?
   % endif
@@ -367,7 +383,7 @@ question: |
   % if al_form_type in ['starts_case', 'existing_case', 'appeal']:
   Is anyone else on your side of this case?
   % else:
-  Is anyone else adding their name to this form with you?
+  Is any other parent or guardian adding their name to this form?
   % endif
 subquestion: |
   % if len(users.elements) > 1:

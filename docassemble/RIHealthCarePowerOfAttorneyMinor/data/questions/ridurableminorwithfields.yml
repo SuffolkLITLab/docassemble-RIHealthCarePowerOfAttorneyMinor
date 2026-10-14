@@ -99,7 +99,7 @@ sections:
   - people: Child Information
   - caregiver: Caregiver Information
   - case_details: Notary Information
-  - review_ridurableminorwithfields: Review your answers
+  - review_ridurableminorwithfields: Preview and Review your answers
   - sign_and_submit: Submit
 ---
 code: |
@@ -166,9 +166,10 @@ code: |
             "reached_interview_end": True,
         },
     )
+    nav.set_section("review_ridurableminorwithfields")
+    ridurableminorwithfields_preview_question
     nav.set_section("sign_and_submit")
     sign_notice
-    ridurableminorwithfields_preview_question
     #basic_questions_signature_flow
     set_progress(100)
     ridurableminorwithfields_download

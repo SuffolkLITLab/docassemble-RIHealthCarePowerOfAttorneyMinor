@@ -49,7 +49,7 @@ metadata:
   jurisdiction: "NAM-US"
   review_date: 2026-09-23
   form_titles:
-    - RIDurableMinor-with-fields
+    - RI Durable Power of Attorney for Minor
   form_numbers: []
   update_notes: ""
 ---
@@ -78,7 +78,7 @@ code: |
   # are editable in Weaver's AssemblyLine settings panel.
   al_next_steps_enabled = True
   al_next_steps_intro_prompt = 'Authorize healthcare decisions for your child'
-  al_next_steps_title = 'RIDurableMinor-with-fields'
+  al_next_steps_title = 'RI Durable Power of Attorney for Minors'
   al_next_steps_document_title = 'Power of Attorney'
   al_next_steps_document_purpose = 'Healthcare'
   al_next_steps_help_organization = ''
@@ -102,12 +102,16 @@ sections:
   - review_ridurableminorwithfields: Review your answers
   - sign_and_submit: Submit
 ---
+code: |
+  keep_going = True
+---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_ridurableminorwithfields
 mandatory: True
 code: |
+  # while keep_going:
   al_intro_screen
   ridurableminorwithfields_intro
   # Below sets the user_role and user_ask_role by asking a question.
@@ -163,6 +167,7 @@ code: |
         },
     )
     nav.set_section("sign_and_submit")
+    sign_notice
     ridurableminorwithfields_preview_question
     #basic_questions_signature_flow
     set_progress(100)
@@ -181,8 +186,8 @@ field: acknowledged_1791942181011
 ---
 id: RIDurableMinor with fields intro
 continue button field: ridurableminorwithfields_intro
-question: |
-  RIDurableMinor-with-fields
+question: |2
+  RI Durable Power of Attorney for Minors
 subquestion: |
   ### Before you get started
   - Gather the necessary information about your child and the designated caregiver.
@@ -434,7 +439,10 @@ question: |2-
   
   Caregiver's full name and address
 
-subquestion: "${ action_button_html(url_action('al_intro_screen'), label=word('Restart Interview'), color='info') }"
+subquestion: |2
+  ${ action_button_html(url_action('al_intro_screen'), label=word('Restart Interview'), color='info') }
+  
+  Would you like to restart the interview?
 event: restart_interview
 ---
 id: users names
@@ -457,21 +465,26 @@ fields:
   - code: |
       users[i].name_fields()
 ---
+id: sign_notice
+question: "Next Steps:"
+subquestion: "Important! Do NOT sign this form until you are in front of a notary."
+event: sign_notice
+continue button field: sign_notice
+---
 id: another user
 question: |
-  Is any other parent or guardian adding their name to this form?
-subquestion: |
-  % if len(users.elements) > 1:
-  So far you have told us about ${ comma_and_list(users.complete_elements()) }.
-  % elif len(users.elements) == 2:
-  You have told us about ${ comma_and_list(users.complete_elements()) }. Click Continue to finish completing the form.
+  % if len(users.elements) < 2:
+  Is there any other parent or guardian adding their name to this form?
+  % else:
+  You have entered two parents or guardians. Click Continue to finish completing the form.
   % endif
+subquestion: |2
+  So far you have told us about ${ comma_and_list(users.complete_elements()) }.
 fields:
-  - no label: users.there_is_another
+  - label: datatype
+    field: yesnoradio
     datatype: yesnoradio
-    show if:
-      code: |
-        len(users.complete_elements()) < 2
+    show if: {"code":"len(users.complete_elements()) < 2\n"}
   # - no label: users.there_is_another
   #   datatype: yesnoradio
   #   show if:
@@ -480,7 +493,7 @@ fields:
 ---
 id: preview ridurableminorwithfields
 question: |
-  Preview your form before you sign it
+  Preview your form before you download it.
 subquestion: |
   Here is a preview of the form you will sign on the next page.
 

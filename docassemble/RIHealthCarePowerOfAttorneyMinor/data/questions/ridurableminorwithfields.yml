@@ -100,7 +100,7 @@ sections:
   - caregiver: Caregiver Information
   - case_details: Notary Information
   - review_ridurableminorwithfields: Review your answers
-  - sign_and_submit: Sign & submit
+  - sign_and_submit: Submit
 ---
 #################### Interview order #####################
 comment: |
@@ -116,42 +116,68 @@ code: |
   is_parent
   if is_parent == False:
     required_info
-  nav.set_section("about_you")
-  users.gather()
-  set_parts(subtitle=str(users))
-  users[0].address.address
-  #users1_signature_date
-  set_progress(25)
-  nav.set_section("people")
-  children.gather()
-  children[0].birthdate
-  set_progress(49)
-  nav.set_section("caregiver")
-  caregivers.gather()
-  caregivers[0].address.address
-  set_progress(74)
-  nav.set_section("case_details")
-  notary.gather()
-  notary[0].address.address
-  notary1_signature_date_day
-  known_sign_date
-  if known_sign_date:
-    users1_signature_date
-    signature_date
-  # Store anonymous data for analytics / statistics
-  store_variables_snapshot(
-      persistent=True,
-      data={
-          "zip": showifdef("users[0].address.zip"),
-          "reached_interview_end": True,
-      },
-  )
-  nav.set_section("sign_and_submit")
-  ridurableminorwithfields_preview_question
-  basic_questions_signature_flow
-  set_progress(100)
-  ridurableminorwithfields_download
+  if is_parent or required_info:
+    nav.set_section("about_you")
+    users.gather()
+    set_parts(subtitle=str(users))
+    users[0].address.address
+    set_progress(25)
+    nav.set_section("people")
+    children.gather()
+    children[0].birthdate
+    set_progress(49)
+    nav.set_section("caregiver")
+    caregivers.gather()
+    caregivers[0].address.address
+    set_progress(74)
+    nav.set_section("case_details")
+    notary_information_screen
+    # if notary_present:
+      # notary.gather()
+      # notary[0].address.address
+      # notary1_signature_date_day
+    # signing_today
+    # if signing_today and notary_present:
+    #   # preview/edit screen
+    #   # signature screen
+    #   pass
+    # elif signing_today:
+    #   # get today's date
+    #   # preview/edit screen
+    #   pass
+    # else:
+    #   known_sign_date
+    #   if known_sign_date:
+    #     users1_signature_date
+    #     signature_date
+    #     # edit/preview screen
+    #   else:
+    #     # edit/preview screen
+    #     pass
+    # Store anonymous data for analytics / statistics
+    store_variables_snapshot(
+        persistent=True,
+        data={
+            "zip": showifdef("users[0].address.zip"),
+            "reached_interview_end": True,
+        },
+    )
+    nav.set_section("sign_and_submit")
+    ridurableminorwithfields_preview_question
+    #basic_questions_signature_flow
+    set_progress(100)
+    ridurableminorwithfields_download
+  else:
+    #end screen
+    restart_interview
   
+---
+comment: |
+  Explain what the blocks below do, and why.
+---
+id: continue_1791942181011
+question: Continue when you are ready
+field: acknowledged_1791942181011
 ---
 id: RIDurableMinor with fields intro
 continue button field: ridurableminorwithfields_intro
@@ -178,21 +204,23 @@ fields:
 id: Parent Signatures
 question: |
   Parent Signatures
-subquestion: |
-  Please provide the signatures and names of the parents.
+subquestion: |2
+  Please provide the date of signatures and names of the parents.
 fields:
   - "Date of first parent signature": users1_signature_date
     datatype: date
   - "First parent full name": users1_name_1
   - label: Date of second parent signature
-    #Need to change this variable, but it works...
     show if:
       code: |
-        is_parent == False
+        len(users) == 2
     field: users2_signature_date
     datatype: date
     required: False
   - label: Second parent full name
+    show if:
+      code: |
+        len(users) == 2
     field: users2_name_2
     required: False
 ---
@@ -297,6 +325,15 @@ fields:
   - code: |
       children[i].name_fields()
 ---
+id: is there a notary
+question: "Do you know who will be the notary to sign this form?"
+subquestion: "A notary must be present when the form is signed."
+fields:
+  - label: " "
+    field: notary_present
+    datatype: yesnoradio
+    floating label: "True"
+---
 id: notary names
 sets:
   - notary[i].name.first
@@ -332,31 +369,73 @@ fields:
 id: preliminary question
 question: "Are you the parent of the minor for whom this form is for?"
 fields:
-  - Parent?: is_parent
+  - " ": is_parent
+    datatype: yesnoradio
+---
+id: notary_information
+event: notary_information_screen
+question: "Notary Information"
+subquestion: |2+
+  In order for the form to be valid, you must get a notary to sign this form.
+  
+  All RI Notaries Public are empowered to perform notarial acts for the general public. If you are looking for a notary, you can visit your local post office, library or financial institution.
+  
+  
+#event: notary_information_screen
+continue button field: notary_information_screen
+---
+id: signing today
+question: |
+  % if is_parent:
+  Are you signing today?
+  % elif len(users) == 2:
+  Is ${ comma_and_list(users.complete_elements())} signing today?
+  % else:
+  Is ${ users[i] } signing today?
+  % endif
+fields:
+  - " ": signing_today
     datatype: yesnoradio
 ---
 id: nonparent info
 question: "If you are not the parent, do you have all the necessary information to fill out the form?"
 subquestion: |2-
-  Required Information:
+  ### Required Information
   
-  Parent information required:
   
-  First and Last name
+  ##### Parent information required:
+  * Parent(s) first and last name
+  * Parents address
   
-  Address
+  ##### Child information required:
+  * First and Last name
+  * Birthday
   
-  Child information required:
-  
-  First and Last name
-  
-  Birthday
-  
-  Caregiver's full name and address
-  
+  ##### Caregiver's full name and address
 fields:
   - Information?: required_info
     datatype: yesnoradio
+---
+id: continue_1791942190056
+question: Continue when you are ready
+field: acknowledged_1791942190056
+---
+id: restart_interview
+question: |2-
+  ##### Restart the interview when you have gathered all important information:
+  
+  Parent information required:
+  * Parent(s) first and last name
+  * Parents address
+  
+  Child information required:
+  * First and Last name
+  * Birthday
+  
+  Caregiver's full name and address
+
+subquestion: "${ action_button_html(url_action('al_intro_screen'), label=word('Restart Interview'), color='info') }"
+event: restart_interview
 ---
 id: users names
 sets:
@@ -380,18 +459,24 @@ fields:
 ---
 id: another user
 question: |
-  % if al_form_type in ['starts_case', 'existing_case', 'appeal']:
-  Is anyone else on your side of this case?
-  % else:
   Is any other parent or guardian adding their name to this form?
-  % endif
 subquestion: |
   % if len(users.elements) > 1:
   So far you have told us about ${ comma_and_list(users.complete_elements()) }.
+  % elif len(users.elements) == 2:
+  You have told us about ${ comma_and_list(users.complete_elements()) }. Click Continue to finish completing the form.
   % endif
 fields:
   - no label: users.there_is_another
     datatype: yesnoradio
+    show if:
+      code: |
+        len(users.complete_elements()) < 2
+  # - no label: users.there_is_another
+  #   datatype: yesnoradio
+  #   show if:
+  #     code: |
+  #       len(users.complete_elements()) == 2
 ---
 id: preview ridurableminorwithfields
 question: |
@@ -410,7 +495,8 @@ subquestion: |
 continue button field: ridurableminorwithfields_preview_question
 ---
 code: |
-  signature_fields = ['users[0].signature', 'users[1].signature']
+  signature_fields = [user.attr_name("signature") for user in users.complete_elements()] #+ (["notary.signature"] if notary else [])
+  
 ---
 id: ridurableminorwithfields review screen
 event: review_ridurableminorwithfields
@@ -685,10 +771,10 @@ attachment:
       - "caregivers1_address_on_one_line": ${ caregivers[0].address.on_one_line() }
       - "users1_signature": ${ users[0].signature_if_final(i) }
       - "users1_signature_date": ${ users1_signature_date.format() }
-      - "users1_name_1": ${ users1_name_1 }
+      - "users1_name_1": ${ users[0] }
       - "users2_signature": ${ users[1].signature_if_final(i) }
       - "users2_signature_date": ${ users2_signature_date.format() }
-      - "users2_name_2": ${ users2_name_2 }
+      - "users2_name_2": ${ users[1] }
       - "notary1_address_county": ${ notary[0].address.county }
       - "notary1_signature_date_day": ${ notary1_signature_date_day }
       - "notary1_signature_date_month": ${ notary1_signature_date_month }

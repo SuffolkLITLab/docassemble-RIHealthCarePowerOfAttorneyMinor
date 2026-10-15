@@ -136,28 +136,6 @@ code: |
     set_progress(74)
     nav.set_section("case_details")
     notary_information_screen
-    # if notary_present:
-      # notary.gather()
-      # notary[0].address.address
-      # notary1_signature_date_day
-    # signing_today
-    # if signing_today and notary_present:
-    #   # preview/edit screen
-    #   # signature screen
-    #   pass
-    # elif signing_today:
-    #   # get today's date
-    #   # preview/edit screen
-    #   pass
-    # else:
-    #   known_sign_date
-    #   if known_sign_date:
-    #     users1_signature_date
-    #     signature_date
-    #     # edit/preview screen
-    #   else:
-    #     # edit/preview screen
-    #     pass
     # Store anonymous data for analytics / statistics
     store_variables_snapshot(
         persistent=True,
@@ -170,13 +148,11 @@ code: |
     ridurableminorwithfields_preview_question
     nav.set_section("sign_and_submit")
     sign_notice
-    #basic_questions_signature_flow
     set_progress(100)
     ridurableminorwithfields_download
   else:
     #end screen
-    restart_interview
-  
+    restart_interview  
 ---
 comment: |
   Explain what the blocks below do, and why.
@@ -199,36 +175,6 @@ subquestion: |
   - Provide a copy to the designated caregiver and keep one for your records.
 
   You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
----
-id: known signature date
-question: "Signature Date"
-subquestion: "Do you know when you plan on signing this form in front of a notary?"
-fields:
-  - " ": known_sign_date
-    datatype: yesnoradio
----
-id: Parent Signatures
-question: |
-  Parent Signatures
-subquestion: |2
-  Please provide the date of signatures and names of the parents.
-fields:
-  - "Date of first parent signature": users1_signature_date
-    datatype: date
-  - "First parent full name": users1_name_1
-  - label: Date of second parent signature
-    show if:
-      code: |
-        len(users) == 2
-    field: users2_signature_date
-    datatype: date
-    required: False
-  - label: Second parent full name
-    show if:
-      code: |
-        len(users) == 2
-    field: users2_name_2
-    required: False
 ---
 id: Notary Information
 question: |
@@ -331,15 +277,6 @@ fields:
   - code: |
       children[i].name_fields()
 ---
-id: is there a notary
-question: "Do you know who will be the notary to sign this form?"
-subquestion: "A notary must be present when the form is signed."
-fields:
-  - label: " "
-    field: notary_present
-    datatype: yesnoradio
-    floating label: "True"
----
 id: notary names
 sets:
   - notary[i].name.first
@@ -389,19 +326,6 @@ subquestion: |2+
   
 #event: notary_information_screen
 continue button field: notary_information_screen
----
-id: signing today
-question: |
-  % if is_parent:
-  Are you signing today?
-  % elif len(users) == 2:
-  Is ${ comma_and_list(users.complete_elements())} signing today?
-  % else:
-  Is ${ users[i] } signing today?
-  % endif
-fields:
-  - " ": signing_today
-    datatype: yesnoradio
 ---
 id: nonparent info
 question: "If you are not the parent, do you have all the necessary information to fill out the form?"
@@ -506,11 +430,7 @@ subquestion: |
   ${ action_button_html(url_action('review_ridurableminorwithfields'), label=word('Edit answers'), color='info') }
 
   Return to this interview tab to continue and sign your form.
-continue button field: ridurableminorwithfields_preview_question
----
-code: |
-  signature_fields = [user.attr_name("signature") for user in users.complete_elements()] #+ (["notary.signature"] if notary else [])
-  
+continue button field: ridurableminorwithfields_preview_question 
 ---
 id: ridurableminorwithfields review screen
 event: review_ridurableminorwithfields
@@ -548,11 +468,6 @@ review:
       Signature of notary public: ${ showifdef('notary_public_signature') }
 
       Notary commission expiration date: ${ showifdef('notary1_commission_expires_date') }
-  - Edit: page_1_marker_4
-    button: |
-      **Document Markers**
-
-      Marker on page one: ${ showifdef('page_1_marker_4') }
   - Edit: children.revisit
     button: |
       **Children**
@@ -567,63 +482,16 @@ review:
       % for item in caregivers:
         * ${ item }
       % endfor
-  - Edit: notary.revisit
-    button: |
-      **Notary**
-
-      % for item in notary:
-        * ${ item }
-      % endfor
-  - Edit: users1_signature_date
-    button: |
-      **Date of first parent signature**
-
-      Date of first parent signature: ${ showifdef('users1_signature_date') }
   - Edit: users1_name_1
     button: |
       **First parent full name**
 
       First parent full name: ${ showifdef('users1_name_1') }
-  - Edit: users2_signature_date
-    button: |
-      **Date of second parent signature**
-
-      Date of second parent signature: ${ showifdef('users2_signature_date') }
   - Edit: users2_name_2
     button: |
       **Second parent full name**
 
       Second parent full name: ${ showifdef('users2_name_2') }
-  - Edit: notary1_signature_date_day
-    button: |
-      **Notary signature date day**
-
-      Notary signature date day: ${ showifdef('notary1_signature_date_day') }
-  - Edit: notary1_signature_date_month
-    button: |
-      **Notary signature date month**
-
-      Notary signature date month: ${ showifdef('notary1_signature_date_month') }
-  - Edit: notary1_signature_date_year
-    button: |
-      **Notary signature date year**
-
-      Notary signature date year: ${ showifdef('notary1_signature_date_year') }
-  - Edit: notary_public_signature
-    button: |
-      **Signature of notary public**
-
-      Signature of notary public: ${ showifdef('notary_public_signature') }
-  - Edit: notary1_commission_expires_date
-    button: |
-      **Notary commission expiration date**
-
-      Notary commission expiration date: ${ showifdef('notary1_commission_expires_date') }
-  - Edit: page_1_marker_4
-    button: |
-      **Marker on page one**
-
-      Marker on page one: ${ showifdef('page_1_marker_4') }
 ---
 id: edit users
 continue button field: users.revisit
@@ -690,15 +558,6 @@ edit:
   - address.address
 confirm: True
 ---
-id: edit notary
-continue button field: notary.revisit
-question: |
-  Edit notary
-subquestion: |
-  ${ notary.table }
-
-  ${ notary.add_action() }
----
 table: notary.table
 rows: notary
 columns:
@@ -720,6 +579,8 @@ subquestion: |
 
   Use the options on this page to view, download and send your form. Use the
   "Edit answers" button to fix any mistakes.
+
+  Remember: Do NOT sign this form until you are in the presence of a notary.
 
   ${ action_button_html(url_action('review_ridurableminorwithfields'), label=word('Edit answers'), color='info') }
 

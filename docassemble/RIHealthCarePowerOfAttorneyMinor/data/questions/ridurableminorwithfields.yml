@@ -66,7 +66,7 @@ code: |
 ---
 template: interview_short_title
 content: |
-  Authorize healthcare decisions for your child
+  Authorize Healthcare Decisions for your Child
 ---
 code: |
   al_form_type = "other_form"
@@ -78,21 +78,24 @@ code: |
   # are editable in Weaver's AssemblyLine settings panel.
   al_next_steps_enabled = True
   al_next_steps_intro_prompt = 'Authorize healthcare decisions for your child'
-  al_next_steps_title = 'RI Durable Power of Attorney for Minors'
+  al_next_steps_title = 'Rhode Island Durable Power of Attorney for Minors'
   al_next_steps_document_title = 'Power of Attorney'
   al_next_steps_document_purpose = 'Healthcare'
   al_next_steps_help_organization = ''
-  al_next_steps_help_url = ''
+  al_next_steps_help_url = 'https://centerforjustice.org/fpp/overview/'
   al_next_steps_generate_qr_code = False
   al_next_steps_what_happens_next = "Once you have signed the document in front of a notary, it is legally effective. Ensure that the designated caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement."
   al_next_steps_what_can_decision_maker_do = 'The designated caregiver can make decisions regarding medical treatment, consent to procedures, and access medical records. They should act in the best interest of your child based on your wishes.'
   al_next_steps_what_happens_if_i_win = 'If the caregiver successfully makes decisions on behalf of your child, it ensures that your child receives timely and appropriate medical care. This can be crucial in emergencies where parental consent is required.'
 ---
+code: |
+  num_parents = 1
+---
 objects:
   - caregivers: ALPeopleList.using(ask_number=True,target_number=1)
   - children: ALPeopleList.using(ask_number=True,target_number=1)
   - notary: ALPeopleList.using(ask_number=True,target_number=1)
-  - users: ALPeopleList.using(there_are_any=True)
+  - users: ALPeopleList.using(ask_number=True, target_number=num_parents)
 ---
 sections:
   - about_you: Parent Information
@@ -122,6 +125,7 @@ code: |
     required_info
   if is_parent or required_info:
     nav.set_section("about_you")
+    num_parents
     users.gather()
     set_parts(subtitle=str(users))
     users[0].address.address
@@ -147,12 +151,11 @@ code: |
     nav.set_section("review_ridurableminorwithfields")
     ridurableminorwithfields_preview_question
     nav.set_section("sign_and_submit")
-    sign_notice
     set_progress(100)
     ridurableminorwithfields_download
   else:
     #end screen
-    restart_interview  
+    restart_interview 
 ---
 comment: |
   Explain what the blocks below do, and why.
@@ -293,22 +296,6 @@ fields:
   - code: |
       notary[i].name_fields()
 ---
-id: notary address
-sets:
-  - "notary[i].address.county"
-  - "notary[i].address.address"
-  - "notary[i].address.city"
-  - "notary[i].address.zip"
-  - "notary[i].address.unit"
-  - "notary[i].address.state"
-  - "notary[i].address.country"
-question: |2
-  What is ${ notary[i].possessive('address') } that they will sign the form?
-fields:
-  - code: |
-      notary[i].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE)
-  - County: notary[i].address.county
----
 id: preliminary question
 question: "Are you the parent of the minor for whom this form is for?"
 fields:
@@ -346,9 +333,18 @@ fields:
   - Information?: required_info
     datatype: yesnoradio
 ---
-id: continue_1791942190056
+id: number of parents
 question: Continue when you are ready
 field: acknowledged_1791942190056
+---
+id: question_1792509241192
+question: "How many parents or guardians will be named on the form?"
+fields:
+  - " ": num_parents
+    datatype: radio
+    choices:
+      - "1"
+      - "2"
 ---
 id: restart_interview
 question: |2-
@@ -377,11 +373,11 @@ sets:
   - users[i].name.middle
   - users[i].name.suffix
 question: |
-  % if i == 0 and al_person_answering == "user" and is_parent:
+  % if i == 0 and al_person_answering == "user" and is_parent and hasattr(users, 'ask_number') and users.ask_number and users.target_number == num_parents:
   What is your name?
   % elif al_form_type in ['starts_case', 'existing_case', 'appeal']:
   Who is the ${ ordinal(i) } person on your side of the case?
-  % elif i == 1 and al_person_answering == "user" and is_parent:
+  % elif i == 1 and al_person_answering == "user" and is_parent and hasattr(users, 'ask_number') and users.ask_number and users.target_number == num_parents:
   What is the name of the second parent or guardian?
   % else:
   What is the name of the Parent(s) who you are filling this form for?
@@ -396,25 +392,20 @@ subquestion: "Important! Do NOT sign this form until you are in front of a notar
 event: sign_notice
 continue button field: sign_notice
 ---
-id: another user
-question: |
-  % if len(users.elements) < 2:
-  Is there any other parent or guardian adding their name to this form?
-  % else:
-  You have entered two parents or guardians. Click Continue to finish completing the form.
-  % endif
-subquestion: |2
-  So far you have told us about ${ comma_and_list(users.complete_elements()) }.
-fields:
-  - label: datatype
-    field: yesnoradio
-    datatype: yesnoradio
-    show if: {"code":"len(users.complete_elements()) < 2\n"}
-  # - no label: users.there_is_another
-  #   datatype: yesnoradio
-  #   show if:
-  #     code: |
-  #       len(users.complete_elements()) == 2
+# id: another user
+# question: |
+#   % if len(users.elements) < 2:
+#   Is there any other parent or guardian adding their name to this form?
+#   % else:
+#   You have entered two parents or guardians. Click Continue to finish completing the form.
+#   % endif
+# subquestion: |2
+#   So far you have told us about ${ comma_and_list(users.complete_elements()) }.
+# fields:
+#   - label: datatype
+#     field: yesnoradio
+#     datatype: yesnoradio
+#     show if: {"code":"len(users.complete_elements()) < 2\n"}
 ---
 id: preview ridurableminorwithfields
 question: |
@@ -663,10 +654,3 @@ attachment:
 template: ridurableminorwithfields_attachment_title
 content: |
   Ridurableminor-with-fields
----
-id: Notary address
-question: |
-  Notary address
-fields:
-- Notary address: notary_address
-  maxlength: 45

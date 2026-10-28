@@ -389,8 +389,9 @@ review:
       **Users**
 
       % for item in users:
-        * ${ item }
+        * Name: ${ item }
       % endfor
+      * Address: ${ users[0].address.on_one_line() }
   - Edit: users1_signature_date
     button: |
       **Parent Signatures**
@@ -420,14 +421,16 @@ review:
       **Children**
 
       % for item in children:
-        * ${ item }
+        * Name: ${ item }
+        * Birthday: ${ item.birthdate }
       % endfor
   - Edit: caregivers.revisit
     button: |
       **Caregivers**
 
       % for item in caregivers:
-        * ${ item }
+        * Name: ${ item }
+        * Address: ${ item.address.on_one_line() }
       % endfor
   - Edit: users1_name_1
     button: |

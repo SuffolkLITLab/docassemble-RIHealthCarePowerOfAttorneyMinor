@@ -91,6 +91,12 @@ code: |
 code: |
   num_parents = 1
 ---
+terms:
+  community care facility: |
+    Licensed residential or day program that provides non-medical care, supervision, and support services to children or adults who need help with daily living activities due to physical handicaps, developmental or mental impairments, or other special needs.
+  notary: |
+    A public official appointed by a government authority to act as an impartial witness when people sign important legal documents.
+---
 objects:
   - caregivers: ALPeopleList.using(ask_number=True,target_number=1)
   - children: ALPeopleList.using(ask_number=True,target_number=1)
@@ -135,6 +141,7 @@ code: |
     children[0].birthdate
     set_progress(49)
     nav.set_section("caregiver")
+    caregiver_screen
     caregivers.gather()
     caregivers[0].address.address
     set_progress(74)
@@ -169,6 +176,9 @@ continue button field: ridurableminorwithfields_intro
 question: |2
   RI Durable Power of Attorney for Minors
 subquestion: |
+
+  You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
+
   ### Before you get started
   - Gather the necessary information about your child and the designated caregiver.
   - Make sure both parents are in agreement with the appointment.
@@ -177,70 +187,21 @@ subquestion: |
   - Sign the document in front of a notary public to make it legally binding.
   - Provide a copy to the designated caregiver and keep one for your records.
 
-  You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
 ---
-id: Notary Information
-question: |
-  Notary Information
-subquestion: |
-  Fill out the details for the notary public.
-fields:
-  - Notary signature date day: notary1_signature_date_day
-    datatype: dropdown
-    choices:
-      - "1"
-      - "2"
-      - "3"
-      - "4"
-      - "5"
-      - "6"
-      - "7"
-      - "8"
-      - "9"
-      - "10"
-      - "11"
-      - "12"
-      - "13"
-      - "14"
-      - "15"
-      - "16"
-      - "17"
-      - "18"
-      - "19"
-      - "20"
-      - "21"
-      - "22"
-      - "23"
-      - "24"
-      - "25"
-      - "26"
-      - "27"
-      - "28"
-      - "29"
-      - "30"
-      - "31"
-  - Notary signature date month: notary1_signature_date_month
-    datatype: dropdown
-    choices:
-      - "01"
-      - "02"
-      - "03"
-      - "04"
-      - "05"
-      - "06"
-      - "07"
-      - "08"
-      - "09"
-      - "10"
-      - "11"
-      - "12"
-  - Notary signature date year: notary1_signature_date_year
-    datatype: dropdown
-    choices:
-      - "26"
-      - "27"
-  - Notary commission expiration date: notary1_commission_expires_date
-    datatype: date
+id: caregiver_screen
+question: "Now you will need to identify a caregiver for the child"
+field: "caregiver_screen"
+subquestion: |2-
+  ###### A caregiver should be:
+  * Over 18 years old
+  * Someone you trust
+  
+  
+  ###### None of the following may be designated as your agent:
+  * Your treating healthcare provider
+  * A nonrelative employee of your treating healthcare provider
+  * An operator of a {community care facility}
+  * A nonrelative employee of an operator of a community care facility
 ---
 comment: |
   The questions below are copies of the questions in AssemblyLine's
@@ -280,6 +241,17 @@ fields:
   - code: |
       children[i].name_fields()
 ---
+id: question_1793193156551
+question: "When is ${ children }'s birthday?"
+subquestion: "Ensure that they are under 18 years old."
+fields:
+  - Birthday: children[0].birthdate
+    datatype: BirthDate
+validation code: |
+  # Block if 18 or older
+  if children[0].age_in_years() >= 18:
+    validation_error("This person appears to be 18 or older. They must be under 18 for this form.")
+---
 id: notary names
 sets:
   - notary[i].name.first
@@ -305,12 +277,17 @@ fields:
 id: notary_information
 event: notary_information_screen
 question: "Notary Information"
-subquestion: |2+
-  In order for the form to be valid, you must get a notary to sign this form.
+subquestion: |2
+  In order for the form to be valid, you must get a {notary} to sign this form.
   
-  All RI Notaries Public are empowered to perform notarial acts for the general public. If you are looking for a notary, you can visit your local post office, library or financial institution.
+  All Rhode Island Notaries Public are empowered to perform notarial acts for the general public.
   
   
+  ##### Where can I access a free Notary?
+  * Community Action Partnership of Providence (CAPP)
+  * Public libraries near you
+  * Bank with which you have a bank account
+  * United Way of Rhode Island (Dial 2-1-1) - they will be able to direct you to notary services and language services
 #event: notary_information_screen
 continue button field: notary_information_screen
 ---
@@ -385,27 +362,6 @@ question: |
 fields:
   - code: |
       users[i].name_fields()
----
-id: sign_notice
-question: "Next Steps:"
-subquestion: "Important! Do NOT sign this form until you are in front of a notary."
-event: sign_notice
-continue button field: sign_notice
----
-# id: another user
-# question: |
-#   % if len(users.elements) < 2:
-#   Is there any other parent or guardian adding their name to this form?
-#   % else:
-#   You have entered two parents or guardians. Click Continue to finish completing the form.
-#   % endif
-# subquestion: |2
-#   So far you have told us about ${ comma_and_list(users.complete_elements()) }.
-# fields:
-#   - label: datatype
-#     field: yesnoradio
-#     datatype: yesnoradio
-#     show if: {"code":"len(users.complete_elements()) < 2\n"}
 ---
 id: preview ridurableminorwithfields
 question: |
@@ -571,7 +527,7 @@ subquestion: |
   Use the options on this page to view, download and send your form. Use the
   "Edit answers" button to fix any mistakes.
 
-  Remember: Do NOT sign this form until you are in the presence of a notary.
+  Remember: Do NOT sign this form until you are in the presence of a {notary}.
 
   ${ action_button_html(url_action('review_ridurableminorwithfields'), label=word('Edit answers'), color='info') }
 
@@ -597,7 +553,7 @@ content: |
 ---
 template: ridurableminorwithfields_attachment.title
 content: |
-  RIDurableMinor-with-fields
+  Completed Durable Power of Attorney Form
 ---
 template: al_user_bundle.title
 content: |

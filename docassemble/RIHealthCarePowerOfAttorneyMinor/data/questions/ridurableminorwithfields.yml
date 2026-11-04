@@ -2,26 +2,27 @@
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALAnyState:any_state.yml
+  - docassemble.demo:data/questions/examples/cards.yml
 ---
 metadata:
   title: >-
     Rhode Island: Durable Power of Attorney for Minor
   short title: >-
-    RI Power of Attorney (Minor)
+    Rhode Island Power of Attorney (Minor)
   description: |-
     This form allows parents to appoint a caregiver to make healthcare decisions for their child in case they are unable to do so. It ensures that medical treatment can be provided promptly when needed.
   can_I_use_this_form: |
-    You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
+    You can use this form if you are a parent or legal guardian and want to choose someone to make healthcare decisions for your child. It is important to ensure that the chosen person is trustworthy and understands your wishes regarding medical care.
   before_you_start: |
     ### Before you get started
-    - Gather the necessary information about your child and the designated caregiver.
+    - Gather the necessary information about your child and the chosen caregiver.
     - Make sure both parents are in agreement with the appointment.
 
     ### When you are finished
     - Sign the document in front of a notary public to make it legally binding.
-    - Provide a copy to the designated caregiver and keep one for your records.
+    - Provide a copy to the chosen caregiver and keep one for your records.
   when_you_are_finished: |
-    Once you have signed the document in front of a notary, it is legally effective. Ensure that the designated caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement.
+    Once you have signed the document in front of a notary, it is legally effective. Ensure that the chosen caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement.
   efiling_enabled: False
   integrated_efiling: False
   integrated_email_filing: False
@@ -49,7 +50,7 @@ metadata:
   jurisdiction: "NAM-US"
   review_date: 2026-09-23
   form_titles:
-    - RI Durable Power of Attorney for Minor
+    - Rhode Island Durable Power of Attorney for Minor
   form_numbers: []
   update_notes: ""
 ---
@@ -66,7 +67,7 @@ code: |
 ---
 template: interview_short_title
 content: |
-  Authorize Healthcare Decisions for your Child
+  Allow Healthcare Decisions for your Child
 ---
 code: |
   al_form_type = "other_form"
@@ -77,15 +78,15 @@ code: |
   # These exact-name variables drive the reusable next-steps DOCX shell and
   # are editable in Weaver's AssemblyLine settings panel.
   al_next_steps_enabled = True
-  al_next_steps_intro_prompt = 'Authorize healthcare decisions for your child'
+  al_next_steps_intro_prompt = 'Allow healthcare decisions for your child'
   al_next_steps_title = 'Rhode Island Durable Power of Attorney for Minors'
   al_next_steps_document_title = 'Power of Attorney'
   al_next_steps_document_purpose = 'Healthcare'
   al_next_steps_help_organization = ''
   al_next_steps_help_url = 'https://centerforjustice.org/fpp/overview/'
   al_next_steps_generate_qr_code = False
-  al_next_steps_what_happens_next = "Once you have signed the document in front of a notary, it is legally effective. Ensure that the designated caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement."
-  al_next_steps_what_can_decision_maker_do = 'The designated caregiver can make decisions regarding medical treatment, consent to procedures, and access medical records. They should act in the best interest of your child based on your wishes.'
+  al_next_steps_what_happens_next = "Once you have signed the document in front of a notary, it is legally effective. Ensure that the chosen caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement."
+  al_next_steps_what_can_decision_maker_do = 'The chosen caregiver can make decisions regarding medical treatment, consent to procedures, and access medical records. They should act in the best interest of your child based on your wishes.'
   al_next_steps_what_happens_if_i_win = 'If the caregiver successfully makes decisions on behalf of your child, it ensures that your child receives timely and appropriate medical care. This can be crucial in emergencies where parental consent is required.'
 ---
 code: |
@@ -167,41 +168,36 @@ code: |
 comment: |
   Explain what the blocks below do, and why.
 ---
-id: continue_1791942181011
-question: Continue when you are ready
-field: acknowledged_1791942181011
----
 id: RIDurableMinor with fields intro
 continue button field: ridurableminorwithfields_intro
 question: |2
-  RI Durable Power of Attorney for Minors
+  Rhode Island Power of Attorney for Children
 subquestion: |
 
-  You can use this form if you are a parent or legal guardian and want to designate someone to make healthcare decisions for your minor child. It is important to ensure that the designated person is trustworthy and understands your wishes regarding medical care.
+  You can use this form if you are a parent or legal guardian and want to choose someone to make healthcare decisions for your child. It is important to ensure that the chosen person is trustworthy and understands your wishes regarding medical care.
 
   ### Before you get started
-  - Gather the necessary information about your child and the designated caregiver.
+  - Gather the necessary information about your child and the chosen caregiver.
   - Make sure both parents are in agreement with the appointment.
 
   ### When you are finished
   - Sign the document in front of a notary public to make it legally binding.
-  - Provide a copy to the designated caregiver and keep one for your records.
+  - Provide a copy to the chosen caregiver and keep one for your records.
 
 ---
 id: caregiver_screen
-question: "Now you will need to identify a caregiver for the child"
+question: "Important caregiver information"
 field: "caregiver_screen"
 subquestion: |2-
   ###### A caregiver should be:
   * Over 18 years old
   * Someone you trust
+  * Good people would be a relative or close friend
   
   
-  ###### None of the following may be designated as your agent:
-  * Your treating healthcare provider
-  * A nonrelative employee of your treating healthcare provider
-  * An operator of a {community care facility}
-  * A nonrelative employee of an operator of a community care facility
+  ###### None of the following may be a caregiver:
+  * Your healthcare provider who is not a relative
+  * An operator of a {community care facility} who is not a relative
 ---
 comment: |
   The questions below are copies of the questions in AssemblyLine's
@@ -242,7 +238,7 @@ fields:
       children[i].name_fields()
 ---
 id: question_1793193156551
-question: "When is ${ children }'s birthday?"
+question: "When was ${ children } born?"
 subquestion: "Ensure that they are under 18 years old."
 fields:
   - Birthday: children[0].birthdate
@@ -252,24 +248,8 @@ validation code: |
   if children[0].age_in_years() >= 18:
     validation_error("This person appears to be 18 or older. They must be under 18 for this form.")
 ---
-id: notary names
-sets:
-  - notary[i].name.first
-  - notary[i].name.last
-  - notary[i].name.middle
-  - notary[i].name.suffix
-question: |
-  % if hasattr(notary, 'ask_number') and notary.ask_number and notary.target_number == 1:
-  Name of notary
-  % else:
-  Name of the ${ ordinal(i) } notary
-  % endif
-fields:
-  - code: |
-      notary[i].name_fields()
----
 id: preliminary question
-question: "Are you the parent of the minor for whom this form is for?"
+question: "Are you the parent of the child for whom this form is for?"
 fields:
   - " ": is_parent
     datatype: yesnoradio
@@ -288,7 +268,6 @@ subquestion: |2
   * Public libraries near you
   * Bank with which you have a bank account
   * United Way of Rhode Island (Dial 2-1-1) - they will be able to direct you to notary services and language services
-#event: notary_information_screen
 continue button field: notary_information_screen
 ---
 id: nonparent info
@@ -316,6 +295,7 @@ field: acknowledged_1791942190056
 ---
 id: question_1792509241192
 question: "How many parents or guardians will be named on the form?"
+subquestion: "##### Both parents or guardians are required to be on the form if both share custody of child"
 fields:
   - " ": num_parents
     datatype: radio
@@ -324,23 +304,8 @@ fields:
       - "2"
 ---
 id: restart_interview
-question: |2-
-  ##### Restart the interview when you have gathered all important information:
-  
-  Parent information required:
-  * Parent(s) first and last name
-  * Parents address
-  
-  Child information required:
-  * First and Last name
-  * Birthday
-  
-  Caregiver's full name and address
-
-subquestion: |2
-  ${ action_button_html(url_action('al_intro_screen'), label=word('Restart Interview'), color='info') }
-  
-  Would you like to restart the interview?
+question: |2
+  Stop, you do not have the required information to continue
 event: restart_interview
 ---
 id: users names
@@ -352,8 +317,6 @@ sets:
 question: |
   % if i == 0 and al_person_answering == "user" and is_parent and hasattr(users, 'ask_number') and users.ask_number and users.target_number == num_parents:
   What is your name?
-  % elif al_form_type in ['starts_case', 'existing_case', 'appeal']:
-  Who is the ${ ordinal(i) } person on your side of the case?
   % elif i == 1 and al_person_answering == "user" and is_parent and hasattr(users, 'ask_number') and users.ask_number and users.target_number == num_parents:
   What is the name of the second parent or guardian?
   % else:
@@ -365,7 +328,7 @@ fields:
 ---
 id: preview ridurableminorwithfields
 question: |
-  Preview your form before you download it.
+  Preview your form before you download it
 subquestion: |
   Here is a preview of the form you will sign on the next page.
 
@@ -392,30 +355,6 @@ review:
         * Name: ${ item }
       % endfor
       * Address: ${ users[0].address.on_one_line() }
-  - Edit: users1_signature_date
-    button: |
-      **Parent Signatures**
-
-      Date of first parent signature: ${ showifdef('users1_signature_date') }
-
-      First parent full name: ${ showifdef('users1_name_1') }
-
-      Date of second parent signature: ${ showifdef('users2_signature_date') }
-
-      Second parent full name: ${ showifdef('users2_name_2') }
-  - Edit: notary1_signature_date_day
-    button: |
-      **Notary Information**
-
-      Notary signature date day: ${ showifdef('notary1_signature_date_day') }
-
-      Notary signature date month: ${ showifdef('notary1_signature_date_month') }
-
-      Notary signature date year: ${ showifdef('notary1_signature_date_year') }
-
-      Signature of notary public: ${ showifdef('notary_public_signature') }
-
-      Notary commission expiration date: ${ showifdef('notary1_commission_expires_date') }
   - Edit: children.revisit
     button: |
       **Children**
@@ -432,16 +371,6 @@ review:
         * Name: ${ item }
         * Address: ${ item.address.on_one_line() }
       % endfor
-  - Edit: users1_name_1
-    button: |
-      **First parent full name**
-
-      First parent full name: ${ showifdef('users1_name_1') }
-  - Edit: users2_name_2
-    button: |
-      **Second parent full name**
-
-      Second parent full name: ${ showifdef('users2_name_2') }
 ---
 id: edit users
 continue button field: users.revisit
@@ -508,18 +437,6 @@ edit:
   - address.address
 confirm: True
 ---
-table: notary.table
-rows: notary
-columns:
-  - Address: |
-      row_item.address.block() if defined("row_item.address.county") else ""
-  - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
-edit:
-  - address.county
-  - name.first
-confirm: True
----
 id: download ridurableminorwithfields
 event: ridurableminorwithfields_download
 question: |
@@ -530,7 +447,10 @@ subquestion: |
   Use the options on this page to view, download and send your form. Use the
   "Edit answers" button to fix any mistakes.
 
-  Remember: Do NOT sign this form until you are in the presence of a {notary}.
+  ${ card_start("Remember:", color="info", icon="comment") }
+  Do not sign this form until you are in the presence of a notary.
+  ${ card_end() }
+  Remember: Do not sign this form until you are in the presence of a notary.
 
   ${ action_button_html(url_action('review_ridurableminorwithfields'), label=word('Edit answers'), color='info') }
 

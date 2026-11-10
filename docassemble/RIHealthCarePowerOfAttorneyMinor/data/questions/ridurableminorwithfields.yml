@@ -8,7 +8,7 @@ metadata:
   title: >-
     Rhode Island: Durable Power of Attorney for Minor
   short title: >-
-    Rhode Island Power of Attorney (Minor)
+    Power of Attorney (Minor)
   description: |-
     This form allows parents to appoint a caregiver to make healthcare decisions for their child in case they are unable to do so. It ensures that medical treatment can be provided promptly when needed.
   can_I_use_this_form: |
@@ -16,7 +16,7 @@ metadata:
   before_you_start: |
     ### Before you get started
     - Gather the necessary information about your child and the chosen caregiver.
-    - Make sure both parents are in agreement with the appointment.
+    - Include one or both parents who have legal custody of the child. Make sure all parents with legal custody agree with this choice.
 
     ### When you are finished
     - Sign the document in front of a notary public to make it legally binding.
@@ -35,6 +35,8 @@ metadata:
   estimated_completion_delta: ""
   LIST_topics:
     - "CO-00-00-00-00"
+    - "FA-14-00-00-00"
+    # want more specific topic for family gaurdianship/healthcare
   tags:
     - "CO-00-00-00-00"
   authors:
@@ -63,7 +65,7 @@ code: |
   AL_DEFAULT_STATE = "RI"
 ---
 code: |
-  github_repo_name = 'docassemble-Ridurableminorwithfields'
+  github_repo_name = 'docassemble-RIHealthCarePowerOfAttorneyMinor'
 ---
 template: interview_short_title
 content: |
@@ -192,7 +194,7 @@ subquestion: |2-
   ###### A caregiver should be:
   * Over 18 years old
   * Someone you trust
-  * Good people would be a relative or close friend
+  * For example, a relative or close family friend
   
   
   ###### None of the following may be a caregiver:
@@ -249,7 +251,7 @@ validation code: |
     validation_error("This person appears to be 18 or older. They must be under 18 for this form.")
 ---
 id: preliminary question
-question: "Are you the parent of the child for whom this form is for?"
+question: "Are you the parent of the child?"
 fields:
   - " ": is_parent
     datatype: yesnoradio
@@ -288,10 +290,6 @@ subquestion: |2-
 fields:
   - Information?: required_info
     datatype: yesnoradio
----
-id: number of parents
-question: Continue when you are ready
-field: acknowledged_1791942190056
 ---
 id: question_1792509241192
 question: "How many parents or guardians will be named on the form?"
@@ -349,7 +347,7 @@ question: |
 review:
   - Edit: users.revisit
     button: |
-      **Users**
+      **Parents or Guardians**
 
       % for item in users:
         * Name: ${ item }
@@ -375,7 +373,7 @@ review:
 id: edit users
 continue button field: users.revisit
 question: |
-  Edit users
+  Edit parents or guardians
 subquestion: |
   ${ users.table }
 
@@ -401,8 +399,6 @@ question: |
   Edit children
 subquestion: |
   ${ children.table }
-
-  ${ children.add_action() }
 ---
 table: children.table
 rows: children
@@ -422,8 +418,6 @@ question: |
   Edit caregivers
 subquestion: |
   ${ caregivers.table }
-
-  ${ caregivers.add_action() }
 ---
 table: caregivers.table
 rows: caregivers

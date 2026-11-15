@@ -6,7 +6,7 @@ include:
 ---
 metadata:
   title: >-
-    Rhode Island: Durable Power of Attorney for Minor
+    Rhode Island: Power of Attorney for a Child's Health Care
   short title: >-
     Power of Attorney (Minor)
   description: |-
@@ -34,11 +34,11 @@ metadata:
   estimated_completion_minutes: ""
   estimated_completion_delta: ""
   LIST_topics:
-    - "CO-00-00-00-00"
-    - "FA-14-00-00-00"
-    # want more specific topic for family gaurdianship/healthcare
+    - "ES-03-03-00-00"
+    - "HE-00-00-00-00"
   tags:
-    - "CO-00-00-00-00"
+    - "ES-03-03-00-00"
+    - "HE-00-00-00-00"
   authors:
     - Court Forms Online
   original_form: []
@@ -49,7 +49,7 @@ metadata:
   generated_on: "2026-09-23"
   languages:
     - en
-  jurisdiction: "NAM-US"
+  jurisdiction: "NAM-US-US+RI"
   review_date: 2026-09-23
   form_titles:
     - Rhode Island Durable Power of Attorney for Minor

@@ -5,6 +5,7 @@ include:
   - docassemble.demo:data/questions/examples/cards.yml
 ---
 metadata:
+  asklit_id: "0b62ff01d07c4dd1ba8fc468e63ed1dc"
   title: >-
     Rhode Island: Power of Attorney for a Child's Health Care
   short title: >-

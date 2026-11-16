@@ -254,7 +254,7 @@ validation code: |
 id: preliminary question
 question: "Are you the parent of the child?"
 fields:
-  - " ": is_parent
+  - "Are you the parent of the child?": is_parent
     datatype: yesnoradio
 ---
 id: notary_information
@@ -279,15 +279,15 @@ subquestion: |2-
   ### Required Information
   
   
-  ##### Parent information required:
+  #### Parent information required:
   * Parent(s) first and last name
   * Parents address
   
-  ##### Child information required:
+  #### Child information required:
   * First and Last name
   * Birthday
   
-  ##### Caregiver's full name and address
+  #### Caregiver's full name and address
 fields:
   - Information?: required_info
     datatype: yesnoradio
@@ -296,7 +296,7 @@ id: question_1792509241192
 question: "How many parents or guardians will be named on the form?"
 subquestion: "##### Both parents or guardians are required to be on the form if both share custody of child"
 fields:
-  - " ": num_parents
+  - "Number of parents or guardians": num_parents
     datatype: radio
     choices:
       - "1"

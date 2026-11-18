@@ -1,4 +1,11 @@
 ---
+translations:
+  - FamilySpanish03_es.xlsx
+---
+include:
+  - family_spanish_words.yml
+---
+---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALAnyState:any_state.yml
@@ -48,8 +55,7 @@ metadata:
   typical_role: "unknown"
   al_weaver_version: "2.3.1"
   generated_on: "2026-09-23"
-  languages:
-    - en
+  languages: [en, es]
   jurisdiction: "NAM-US-US+RI"
   review_date: 2026-09-23
   form_titles:
@@ -78,19 +84,11 @@ code: |
 id: alweaver assemblyline settings
 initial: True
 code: |
-  # These exact-name variables drive the reusable next-steps DOCX shell and
-  # are editable in Weaver's AssemblyLine settings panel.
+  # Next-steps prose is maintained directly in the bilingual DOCX template.
   al_next_steps_enabled = True
-  al_next_steps_intro_prompt = 'Allow healthcare decisions for your child'
-  al_next_steps_title = 'Rhode Island Durable Power of Attorney for Minors'
-  al_next_steps_document_title = 'Power of Attorney'
-  al_next_steps_document_purpose = 'Healthcare'
   al_next_steps_help_organization = ''
   al_next_steps_help_url = 'https://centerforjustice.org/fpp/overview/'
   al_next_steps_generate_qr_code = False
-  al_next_steps_what_happens_next = "Once you have signed the document in front of a notary, it is legally effective. Ensure that the chosen caregiver has a copy to present in case of a medical emergency. You may also want to inform your child's healthcare provider about this arrangement."
-  al_next_steps_what_can_decision_maker_do = 'The chosen caregiver can make decisions regarding medical treatment, consent to procedures, and access medical records. They should act in the best interest of your child based on your wishes.'
-  al_next_steps_what_happens_if_i_win = 'If the caregiver successfully makes decisions on behalf of your child, it ensures that your child receives timely and appropriate medical care. This can be crucial in emergencies where parental consent is required.'
 ---
 code: |
   num_parents = 1
@@ -249,7 +247,7 @@ fields:
 validation code: |
   # Block if 18 or older
   if children[0].age_in_years() >= 18:
-    validation_error("This person appears to be 18 or older. They must be under 18 for this form.")
+    validation_error(word("This person appears to be 18 or older. They must be under 18 for this form."))
 ---
 id: preliminary question
 question: "Are you the parent of the child?"
@@ -299,8 +297,8 @@ fields:
   - "Number of parents or guardians": num_parents
     datatype: radio
     choices:
-      - "1"
-      - "2"
+      - {label: "1", value: "1"}
+      - {label: "2", value: "2"}
 ---
 id: restart_interview
 question: |2
@@ -386,15 +384,17 @@ table: users.table
 rows: users
 columns:
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
   - Address: |
-      row_item.address.block() if defined("row_item.address.address") else ""
+      row_item.address.block() if row_item.address.attribute_defined('address') else ""
   - Signature: |
-      row_item.signature if defined("row_item.signature") else ""
+      row_item.signature if row_item.attribute_defined('signature') else ""
 edit:
   - name.first
   - address.address
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: edit children
 continue button field: children.revisit
@@ -407,13 +407,15 @@ table: children.table
 rows: children
 columns:
   - Birthdate: |
-      row_item.birthdate if defined("row_item.birthdate") else ""
+      row_item.birthdate if row_item.attribute_defined('birthdate') else ""
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
 edit:
   - birthdate
   - name.first
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: edit caregivers
 continue button field: caregivers.revisit
@@ -426,13 +428,15 @@ table: caregivers.table
 rows: caregivers
 columns:
   - Name: |
-      row_item.name_full() if defined("row_item.name.first") else ""
+      row_item.name_full() if row_item.name.attribute_defined('first') else ""
   - Address: |
-      row_item.address.block() if defined("row_item.address.address") else ""
+      row_item.address.block() if row_item.address.attribute_defined('address') else ""
 edit:
   - name.first
   - address.address
 confirm: True
+edit header: |
+  ${ word("Actions") }
 ---
 id: download ridurableminorwithfields
 event: ridurableminorwithfields_download
@@ -507,15 +511,15 @@ attachment:
       - "users1_name_full": ${ users[0] }
       - "users2_name_full": ${ users[1] }
       - "users1_address_on_one_line": ${ users[0].address.on_one_line() }
-      - "children1_birthdate": ${ children[0].birthdate.format() }
+      - "children1_birthdate": ${ children[0].birthdate.format(language='en') }
       - "children1_name_full": ${ children[0] }
       - "caregivers1_name": ${ caregivers[0] }
       - "caregivers1_address_on_one_line": ${ caregivers[0].address.on_one_line() }
       - "users1_signature": ${ users[0].signature_if_final(i) }
-      - "users1_signature_date": ${ users1_signature_date.format() }
+      - "users1_signature_date": ${ users1_signature_date.format(language='en') }
       - "users1_name_1": ${ users[0] }
       - "users2_signature": ${ users[1].signature_if_final(i) }
-      - "users2_signature_date": ${ users2_signature_date.format() }
+      - "users2_signature_date": ${ users2_signature_date.format(language='en') }
       - "users2_name_2": ${ users[1] }
       - "notary1_address_county": ${ notary[0].address.county }
       - "notary1_signature_date_day": ${ notary1_signature_date_day }
@@ -525,8 +529,18 @@ attachment:
       # It's a signature: test which file version this is; leave empty unless it's the final version)
       - "notary_public_signature": ${ notary_public_signature if i == "final" else '' }
       - "notary1_name_full": ${ notary[0] }
-      - "notary1_commission_expires_date": ${ notary1_commission_expires_date.format() }
+      - "notary1_commission_expires_date": ${ notary1_commission_expires_date.format(language='en') }
 ---
 template: ridurableminorwithfields_attachment_title
 content: |
   Ridurableminor-with-fields
+
+---
+language: es
+sections:
+- about_you: Información de los padres
+- people: Información del menor
+- caregiver: Información de la persona cuidadora
+- case_details: Información del notario
+- review_ridurableminorwithfields: Vista previa y revisión de sus respuestas
+- sign_and_submit: Presentar
